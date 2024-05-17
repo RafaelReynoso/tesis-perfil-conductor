@@ -75,7 +75,7 @@ class _Barra_Navegacion extends State<Barra_Navegacion> {
           shadowColor: Colors.transparent,
           margin: EdgeInsets.all(8.0),
           child: SizedBox.expand(
-            child: Map()
+            child: ConductorMapScreen(),
           ),
         ),
 

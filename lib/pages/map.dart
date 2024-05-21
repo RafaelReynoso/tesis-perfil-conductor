@@ -12,19 +12,20 @@ class ConductorMapScreen extends StatefulWidget {
   _ConductorMapScreenState createState() => _ConductorMapScreenState();
 }
 
-class _ConductorMapScreenState extends State<ConductorMapScreen> {
+class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBindingObserver {
   GoogleMapController? mapController;
   Location location = Location();
   late LatLng _initialcameraposition;
   late StreamSubscription<LocationData> locationSubscription;
   late String _conductorId;
   final DatabaseReference databaseReference =
-      FirebaseDatabase.instance.ref().child('user_locations');
+      FirebaseDatabase.instance.ref('user_locations');
   Map<String, Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);  // Agregar observador
     _initialcameraposition = LatLng(0.0, 0.0);
     _conductorId = Uuid().v4();
     locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) {
@@ -56,12 +57,18 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> {
 
   void _loadInitialUsuarioLocations() async {
     DataSnapshot snapshot = await databaseReference.child('usuarios').get();
-    Map<dynamic, dynamic>? usuarios = snapshot.value as Map<dynamic, dynamic>?;
-    usuarios?.forEach((key, value) {
-      double latitude = value['latitude'];
-      double longitude = value['longitude'];
-      _updateMarker(key, latitude, longitude);
-    });
+    if (snapshot.value != null) {
+      Map<dynamic, dynamic>? usuarios = snapshot.value as Map<dynamic, dynamic>?;
+      if (usuarios != null) {
+        usuarios.forEach((key, value) {
+          if (value is Map<dynamic, dynamic>) {
+            double latitude = value['latitude'];
+            double longitude = value['longitude'];
+            _updateMarker(key, latitude, longitude);
+          }
+        });
+      }
+    }
   }
 
   void _updateMarker(String id, double latitude, double longitude) {
@@ -77,8 +84,21 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> {
 
   @override
   void dispose() {
+    _removeConductorLocation();  // Eliminar la ubicación del conductor al cerrar la app
     locationSubscription.cancel();
+    WidgetsBinding.instance.removeObserver(this);  // Eliminar observador
     super.dispose();
+  }
+
+  void _removeConductorLocation() {
+    databaseReference.child('conductores').child(_conductorId).remove();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached || state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      _removeConductorLocation();  // Eliminar la ubicación del conductor si la app se cierra o se pone en segundo plano
+    }
   }
 
   @override
@@ -87,7 +107,7 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> {
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
           target: _initialcameraposition,
-          zoom: 14.0,
+          zoom: 15.5,
         ),
         onMapCreated: (GoogleMapController controller) {
           mapController = controller;

@@ -71,12 +71,22 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
     }
   }
 
-  void _updateMarker(String id, double latitude, double longitude) {
+  Future<BitmapDescriptor> _getUserMarkerIconFromAsset() async {
+    return await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(size: Size(48, 48)),
+      'assets/user_map.png',
+    );
+  }
+
+  void _updateMarker(String id, double latitude, double longitude) async {
+    final icon = await _getUserMarkerIconFromAsset();
+
     setState(() {
       _markers.remove(id);  // Eliminar el marcador anterior
       _markers[id] = Marker(
         markerId: MarkerId(id),
         position: LatLng(latitude, longitude),
+        icon: icon,
         infoWindow: InfoWindow(title: 'Usuario $id'),
       );
     });

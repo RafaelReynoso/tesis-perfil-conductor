@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './components/navigation_bar.dart';
+import './pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main(List<String> args) async {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: "Tesis_Conductor",
       debugShowCheckedModeBanner: false,
-      home: Barra_Navegacion(),
+      home: SignInPage1(),
     );
   }
 }

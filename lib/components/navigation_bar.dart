@@ -5,16 +5,15 @@ import 'package:flutter_demo_tesis_conductor/pages/profile.dart';
 import 'package:flutter_demo_tesis_conductor/pages/horario.dart';
 
 class Barra_Navegacion extends StatefulWidget {
+  final String usuario;
 
-  final String nombreUsuario;
-
-  const Barra_Navegacion({super.key, required this.nombreUsuario});
+  const Barra_Navegacion({required this.usuario, super.key});
 
   @override
-  State<Barra_Navegacion> createState() => _Barra_Navegacion();
+  State<Barra_Navegacion> createState() => _Barra_NavegacionState();
 }
 
-class _Barra_Navegacion extends State<Barra_Navegacion> {
+class _Barra_NavegacionState extends State<Barra_Navegacion> {
   int currentPageIndex = 1;
 
   @override
@@ -65,20 +64,20 @@ class _Barra_Navegacion extends State<Barra_Navegacion> {
       ),
       body: <Widget>[
         /// Usuario
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Profile(nombreUsuario: widget.nombreUsuario),
-          ),
-        ),
-
-        /// Mapa
         const Card(
           shadowColor: Colors.transparent,
           margin: EdgeInsets.all(8.0),
           child: SizedBox.expand(
-            child: ConductorMapScreen(),
+            child: Profile(),
+          ),
+        ),
+
+        /// Mapa
+        Card(
+          shadowColor: Colors.transparent,
+          margin: const EdgeInsets.all(8.0),
+          child: SizedBox.expand(
+            child: ConductorMapScreen(usuario: widget.usuario),
           ),
         ),
 
@@ -98,7 +97,6 @@ class _Barra_Navegacion extends State<Barra_Navegacion> {
             child: Horario(),
           ),
         ),
-
       ][currentPageIndex],
     );
   }

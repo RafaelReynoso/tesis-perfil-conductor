@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../components/navigation_bar.dart'; // Importa la barra de navegación
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importa Firestore
-
 
 class SignInPage1 extends StatefulWidget {
   const SignInPage1({super.key});
@@ -12,9 +11,11 @@ class SignInPage1 extends StatefulWidget {
 
 class _SignInPage1State extends State<SignInPage1> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
+  final DatabaseReference _databaseRef = FirebaseDatabase.instance.ref();
+
+  String _errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,14 @@ class _SignInPage1State extends State<SignInPage1> {
                       ),
                     ),
                     _gap(),
+                    if (_errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Text(
+                          _errorMessage,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
                     TextFormField(
                       controller: _usuarioController,
                       decoration: const InputDecoration(
@@ -98,9 +107,7 @@ class _SignInPage1State extends State<SignInPage1> {
                           ),
                           backgroundColor: Colors.green,
                         ),
-                        onPressed: () {
-                          _verificarCredenciales();
-                        },
+                        onPressed: _login,
                         child: const Padding(
                           padding: EdgeInsets.all(10.0),
                           child: Text(
@@ -126,45 +133,44 @@ class _SignInPage1State extends State<SignInPage1> {
 
   Widget _gap() => const SizedBox(height: 16);
 
-  Future<void> _verificarCredenciales() async {
-    final String usuario = _usuarioController.text.trim();
-    final String contrasena = _contrasenaController.text.trim();
+  void _login() async {
+  String usuario = _usuarioController.text.trim();
+  String contrasena = _contrasenaController.text.trim();
 
-    try {
-      final QuerySnapshot querySnapshot = await _firestore
-          .collection('conductores')
-          .where('nombre_usuario', isEqualTo: usuario)
-          .where('contrasena', isEqualTo: contrasena)
-          .get();
+  if (usuario.isEmpty || contrasena.isEmpty) {
+    setState(() {
+      _errorMessage = 'Por favor, ingrese usuario y contraseña';
+    });
+    return;
+  }
 
-      if (querySnapshot.docs.isNotEmpty) {
+  DatabaseReference userRef = _databaseRef.child('user_locations').child('conductores').child(usuario).child('informacion').child('password');
+  DatabaseEvent event = await userRef.once();
 
-        final String nombreUsuario = (querySnapshot.docs[0].data() as Map<String, dynamic>)['nombre_usuario'];
-        
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Barra_Navegacion(nombreUsuario: nombreUsuario),
-          ),
-        );
-      } else {
-        // Mostrar un mensaje de error al usuario
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Credenciales incorrectas. Por favor, inténtalo de nuevo.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (error) {
-      // Mostrar un mensaje de error al usuario
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error al verificar las credenciales. Por favor, inténtalo de nuevo.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+  if (event.snapshot.value != null) {
+    String? password = event.snapshot.value as String?;
+    if (password == contrasena) {
+      _navegarABarraDeNavegacion(usuario);
+    } else {
+      setState(() {
+        _errorMessage = 'Contraseña incorrecta';
+      });
     }
+  } else {
+    setState(() {
+      _errorMessage = 'Usuario no encontrado';
+    });
+  }
+}
+
+
+  void _navegarABarraDeNavegacion(String usuario) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Barra_Navegacion(usuario: usuario),
+      ),
+    );
   }
 
   @override

@@ -19,8 +19,7 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   late LatLng _initialcameraposition;
   late StreamSubscription<LocationData> locationSubscription;
   late String _conductorId; // ID único generado para este conductor
-  final DatabaseReference databaseReference = 
-      FirebaseDatabase.instance.ref('user_locations');
+  final DatabaseReference databaseReference = FirebaseDatabase.instance.ref('user_locations');
   final Map<String, Marker> _markers = {};
 
   @override
@@ -37,6 +36,8 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   }
 
   Future<void> _updateLocation(LocationData locationData) async {
+    if (!mounted) return;
+    
     await databaseReference.child('conductores').child(_conductorId).child('ubicacion').set({
       'latitude': locationData.latitude,
       'longitude': locationData.longitude,
@@ -49,14 +50,20 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   void _listenToUsuarioChanges() {
     databaseReference.child('usuarios').onChildChanged.listen((event) {
       String userId = event.snapshot.key!;
-      Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
-      double latitude = data['latitude'];
-      double longitude = data['longitude'];
-      _updateMarker(userId, latitude, longitude);
+      Map? data = event.snapshot.value as Map<dynamic, dynamic>?;
+      if (data != null && data.containsKey('ubicacion')) {
+        Map<dynamic, dynamic> ubicacion = data['ubicacion'];
+        if (ubicacion != null) {
+          double latitude = ubicacion['latitude'];
+          double longitude = ubicacion['longitude'];
+          _updateMarker(userId, latitude, longitude);
+        }
+      } else {
+        _removeMarker(userId);
+      }
     });
 
-    // Escuchar eventos de eliminación de usuarios
-    databaseReference.child('usuarios').onChildRemoved.listen((event) {
+    databaseReference.child('usuarios').child('ubicacion').onChildRemoved.listen((event) {
       String userId = event.snapshot.key!;
       _removeMarker(userId);
     });
@@ -68,10 +75,13 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
       Map<dynamic, dynamic>? usuarios = snapshot.value as Map<dynamic, dynamic>?;
       if (usuarios != null) {
         usuarios.forEach((key, value) {
-          if (value is Map<dynamic, dynamic>) {
-            double latitude = value['latitude'];
-            double longitude = value['longitude'];
-            _updateMarker(key, latitude, longitude);
+          if (value is Map<dynamic, dynamic> && value.containsKey('ubicacion')) {
+            Map<dynamic, dynamic> ubicacion = value['ubicacion'];
+            if (ubicacion != null) {
+              double latitude = ubicacion['latitude'];
+              double longitude = ubicacion['longitude'];
+              _updateMarker(key, latitude, longitude);
+            }
           }
         });
       }
@@ -81,15 +91,16 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   Future<BitmapDescriptor> _getMarkerIconFromAsset() async {
     return await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(size: Size(48, 48)),
-      'assets/user_map.png', // Cambia la ruta a tu icono de usuario
+      'assets/user_map.png',
     );
   }
 
   void _updateMarker(String id, double latitude, double longitude) async {
-    final icon = await _getMarkerIconFromAsset();
+    if (!mounted) return;
 
+    final icon = await _getMarkerIconFromAsset();
     setState(() {
-      _markers.remove(id); // Eliminar el marcador anterior
+      _markers.remove(id);
       _markers[id] = Marker(
         markerId: MarkerId(id),
         position: LatLng(latitude, longitude),
@@ -100,16 +111,18 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   }
 
   void _removeMarker(String id) {
+    if (!mounted) return;
+
     setState(() {
-      _markers.remove(id); // Eliminar el marcador
+      _markers.remove(id);
     });
   }
 
   @override
   void dispose() {
-    _removeConductorLocation(); // Eliminar la ubicación del conductor al cerrar la app
+    _removeConductorLocation();
     locationSubscription.cancel();
-    WidgetsBinding.instance.removeObserver(this); // Eliminar observador
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -120,7 +133,7 @@ class _ConductorMapScreenState extends State<ConductorMapScreen> with WidgetsBin
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.detached || state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
-      _removeConductorLocation(); // Eliminar la ubicación del conductor si la app se cierra o se pone en segundo plano
+      _removeConductorLocation();
     }
   }
 

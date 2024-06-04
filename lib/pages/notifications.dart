@@ -6,9 +6,34 @@ class Notifications extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.circle_notifications,
+                    color: Colors.grey[800],
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Notificaciones',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+      ),
       body: ListView(
         children: const <Widget>[
-          SectionTitle(title: 'Notificaciones'),
           NotificationCard(
             message: 'Mantenimiento programado',
             iconColor: Colors.green,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Profile extends StatelessWidget {
-    const Profile({super.key});
+  final String usuario;
+  const Profile({required this.usuario, Key? key}) : super(key: key);
 
     @override
     Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class Profile extends StatelessWidget {
                                     children: [
                                         const Divider(),
                                         Text(
-                                            'Chofer: Rafael',
+                                            'Chofer: $usuario',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleLarge

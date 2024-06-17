@@ -64,11 +64,11 @@ class _Barra_NavegacionState extends State<Barra_Navegacion> {
       ),
       body: <Widget>[
         /// Usuario
-        const Card(
+        Card(
           shadowColor: Colors.transparent,
-          margin: EdgeInsets.all(8.0),
+          margin: const EdgeInsets.all(8.0),
           child: SizedBox.expand(
-            child: Profile(),
+            child: Profile(usuario: widget.usuario),
           ),
         ),
 

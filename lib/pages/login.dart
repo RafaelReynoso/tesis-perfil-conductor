@@ -20,7 +20,7 @@ class _SignInPage1State extends State<SignInPage1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.teal,
       body: Form(
         key: _formKey,
         child: Center(
@@ -71,10 +71,10 @@ class _SignInPage1State extends State<SignInPage1> {
                         prefixIcon: Icon(Icons.person_outline),
                         border: OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green), // Color del borde cuando el campo está enfocado
+                          borderSide: BorderSide(color: Colors.teal), // Color del borde cuando el campo está enfocado
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green), // Color del borde cuando hay un error y el campo está enfocado
+                          borderSide: BorderSide(color: Colors.teal), // Color del borde cuando hay un error y el campo está enfocado
                         ),
                         labelStyle: TextStyle(color: Colors.black),
                       ),
@@ -87,10 +87,10 @@ class _SignInPage1State extends State<SignInPage1> {
                         prefixIcon: Icon(Icons.lock_outline_rounded),
                         border: OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green), // Color del borde cuando el campo está enfocado
+                          borderSide: BorderSide(color: Colors.teal), // Color del borde cuando el campo está enfocado
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green), // Color del borde cuando hay un error y el campo está enfocado
+                          borderSide: BorderSide(color: Colors.teal), // Color del borde cuando hay un error y el campo está enfocado
                         ),
                         labelStyle: TextStyle(color: Colors.black),
                       ),
@@ -105,7 +105,7 @@ class _SignInPage1State extends State<SignInPage1> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4)
                           ),
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.teal,
                         ),
                         onPressed: _login,
                         child: const Padding(

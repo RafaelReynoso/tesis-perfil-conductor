@@ -30,7 +30,7 @@ class _Barra_NavegacionState extends State<Barra_Navegacion> {
             ),
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.teal,
       ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -38,7 +38,7 @@ class _Barra_NavegacionState extends State<Barra_Navegacion> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.green,
+        indicatorColor: Colors.teal,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -51,7 +51,7 @@ class _Barra_NavegacionState extends State<Barra_Navegacion> {
           ),
           NavigationDestination(
             icon: Badge(
-              label: Text('2'),
+              label: Text('3'),
               child: Icon(Icons.circle_notifications),
             ),
             label: 'Notificaciones',

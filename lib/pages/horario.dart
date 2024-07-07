@@ -69,7 +69,7 @@ class _HorarioState extends State<Horario> {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.visibility, size: 18, color: Colors.green),
+                  Icon(Icons.visibility, size: 18, color: Colors.teal),
                   SizedBox(width: 8), // Espacio entre el ícono y el texto
                   Text(
                     'Mostrar Horario',
